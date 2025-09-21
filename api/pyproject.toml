@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "labelloop"
+version = "0.1.0"
+description = "API"
+authors = ["Léo Bournizien <73833842+Survivor2302@users.noreply.github.com>"]
+readme = "README.md"
+packages = [{include = "app"}]
+
+[tool.poetry.dependencies]
+python = "^3.13"
+fastapi = "^0.116.1"
+uvicorn = "^0.35.0"
+fastapi-cli = "^0.0.11"
+sqlalchemy = "^2.0.0"
+alembic = "^1.13.0"
+psycopg2-binary = "^2.9.0"
+python-dotenv = "^1.0.0"
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"

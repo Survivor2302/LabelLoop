@@ -1,0 +1,154 @@
+# ===========================================
+# MONOREPO GITIGNORE - Next.js + FastAPI
+# ===========================================
+
+# ===========================================
+# SYSTEM FILES
+# ===========================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*~
+
+# ===========================================
+# NEXT.JS / WEBAPP
+# ===========================================
+
+# Dependencies
+webapp/node_modules/
+webapp/.pnp
+webapp/.pnp.*
+webapp/.yarn/*
+!webapp/.yarn/patches
+!webapp/.yarn/plugins
+!webapp/.yarn/releases
+!webapp/.yarn/versions
+
+# Next.js
+webapp/.next/
+webapp/out/
+webapp/build/
+
+# Testing
+webapp/coverage/
+
+# Debug logs
+webapp/npm-debug.log*
+webapp/yarn-debug.log*
+webapp/yarn-error.log*
+webapp/.pnpm-debug.log*
+
+# Environment variables
+webapp/.env*
+webapp/.env.local
+webapp/.env.development.local
+webapp/.env.test.local
+webapp/.env.production.local
+
+# Vercel
+webapp/.vercel
+
+# TypeScript
+webapp/*.tsbuildinfo
+webapp/next-env.d.ts
+
+# ===========================================
+# FASTAPI / API
+# ===========================================
+
+# Python
+api/__pycache__/
+api/*.py[cod]
+api/*$py.class
+api/*.so
+api/.Python
+api/build/
+api/develop-eggs/
+api/dist/
+api/downloads/
+api/eggs/
+api/.eggs/
+api/lib/
+api/lib64/
+api/parts/
+api/sdist/
+api/var/
+api/wheels/
+api/share/python-wheels/
+api/*.egg-info/
+api/.installed.cfg
+api/*.egg
+api/MANIFEST
+
+# Virtual environments
+api/.venv/
+api/venv/
+api/ENV/
+api/env/
+api/.env
+
+# Poetry
+api/.venv/
+api/poetry.lock
+
+# Environment variables
+api/.env
+api/.env.local
+api/.env.development
+api/.env.test
+api/.env.production
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+api/*.log
+api/logs/
+
+# ===========================================
+# GENERAL
+# ===========================================
+
+# Temporary files
+*.tmp
+*.temp
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# Archive files
+*.zip
+*.tar.gz
+*.rar
+*.7z
