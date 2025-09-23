@@ -1,0 +1,107 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: labelloop-postgres-dev
+    environment:
+      POSTGRES_DB: labelloop
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    networks:
+      - labelloop-dev-network
+    restart: unless-stopped
+
+  # MinIO Object Storage
+  minio:
+    image: minio/minio:latest
+    container_name: labelloop-minio-dev
+    environment:
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: password
+    command: server /data --console-address ":9001"
+    volumes:
+      - ./data/minio:/data
+    ports:
+      - "9000:9000" # API
+      - "9001:9001" # Console
+    networks:
+      - labelloop-dev-network
+    restart: unless-stopped
+
+  # MinIO Bucket Creation
+  createbuckets:
+    image: minio/mc:latest
+    container_name: labelloop-minio-createbuckets
+    depends_on:
+      - minio
+    restart: on-failure
+    networks:
+      - labelloop-dev-network
+    entrypoint: >
+      /bin/sh -c "
+      sleep 5;
+      /usr/bin/mc alias set labelloop-minio http://minio:9000 admin password;
+      /usr/bin/mc mb labelloop-minio/datasets;
+      exit 0;
+      "
+
+  # FastAPI Backend (Development)
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile.dev
+    container_name: labelloop-api-dev
+    environment:
+      - DATABASE_URL=postgresql://admin:password@postgres:5432/labelloop
+      - MINIO_ENDPOINT=minio:9000
+      - MINIO_ACCESS_KEY=admin
+      - MINIO_SECRET_KEY=password
+      - MINIO_BUCKET=datasets
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - minio
+      - createbuckets
+    networks:
+      - labelloop-dev-network
+    restart: unless-stopped
+    volumes:
+      - ./api:/app
+      - /app/.venv # Exclude virtual environment from volume mount
+    # Le Dockerfile.dev gère déjà la commande avec uvicorn --reload
+
+  # Next.js Frontend (Development)
+  webapp:
+    build:
+      context: ./webapp
+      dockerfile: Dockerfile.dev
+    container_name: labelloop-webapp-dev
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+      - NODE_ENV=development
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+    networks:
+      - labelloop-dev-network
+    restart: unless-stopped
+    volumes:
+      - ./webapp:/app
+      - /app/node_modules # Exclude node_modules from volume mount
+    # Le Dockerfile.dev gère déjà la commande avec npm run dev
+
+networks:
+  labelloop-dev-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
+  minio_data:
+    driver: local
