@@ -2,9 +2,15 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.api.router import api_router
-from app.api.endpoints.health import router as health_router
-from sqlalchemy import text
 from app.core.database import engine
+from app.model import Annotation, Dataset, Image, Label
+
+
+# Créer les tables de base de données
+Dataset.metadata.create_all(bind=engine)
+Image.metadata.create_all(bind=engine)
+Label.metadata.create_all(bind=engine)
+Annotation.metadata.create_all(bind=engine)
 
 
 app = FastAPI(
@@ -26,12 +32,4 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-@app.get("/")
-def hello_world():
-    return {"message": f"{settings.APP_NAME} - Welcome!"}
-
-
-# Inclure les routes health à la racine et sous /api via api_router
-# app.include_router(health_router)
 app.include_router(api_router)
