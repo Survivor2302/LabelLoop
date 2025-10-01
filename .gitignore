@@ -57,6 +57,43 @@ webapp/*.tsbuildinfo
 webapp/next-env.d.ts
 
 # ===========================================
+# VUE.JS / WEBAPP-VUEJS
+# ===========================================
+
+# Dependencies
+webapp-vuejs/node_modules/
+webapp-vuejs/.pnp
+webapp-vuejs/.pnp.*
+webapp-vuejs/.yarn/*
+!webapp-vuejs/.yarn/patches
+!webapp-vuejs/.yarn/plugins
+!webapp-vuejs/.yarn/releases
+!webapp-vuejs/.yarn/versions
+
+# Vite
+webapp-vuejs/dist/
+webapp-vuejs/dist-ssr/
+
+# Testing
+webapp-vuejs/coverage/
+
+# Debug logs
+webapp-vuejs/npm-debug.log*
+webapp-vuejs/yarn-debug.log*
+webapp-vuejs/yarn-error.log*
+webapp-vuejs/.pnpm-debug.log*
+
+# Environment variables
+webapp-vuejs/.env*
+webapp-vuejs/.env.local
+webapp-vuejs/.env.development.local
+webapp-vuejs/.env.test.local
+webapp-vuejs/.env.production.local
+
+# TypeScript
+webapp-vuejs/*.tsbuildinfo
+
+# ===========================================
 # FASTAPI / API
 # ===========================================
 
