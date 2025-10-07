@@ -8,12 +8,13 @@ from .health import (
 
 # Dataset schemas
 from .dataset import (
-    DatasetStatus,
     DatasetBase,
     DatasetCreate,
     DatasetUpdate,
     Dataset,
     DatasetWithImages,
+    DatasetWithLabels,
+    DatasetDetail,
 )
 
 # Image schemas
@@ -23,15 +24,24 @@ from .image import (
     ImageUpdate,
     Image,
     ImageWithDataset,
+    ImageWithDownloadUrl,
+    ImageStatus,
+    ImageUploadRequest,
+    ImageUploadResponse,
+    ImageUploadBatchRequest,
+    ImageUploadBatchResponse,
+    ImageConfirmUploadRequest,
+    ImageListResponse,
+    ImageWithUrlListResponse,
 )
 
 # Label schemas
 from .label import (
     LabelBase,
     LabelCreate,
-    LabelUpdate,
     Label,
-    LabelWithDataset,
+    LabelListResponse,
+    LabelWithDatasets,
     LabelWithAnnotations,
 )
 
@@ -48,8 +58,10 @@ from .annotation import (
 
 # Update forward references for all schemas
 DatasetWithImages.model_rebuild()
+DatasetWithLabels.model_rebuild()
 ImageWithDataset.model_rebuild()
-LabelWithDataset.model_rebuild()
+LabelListResponse.model_rebuild()
+LabelWithDatasets.model_rebuild()
 LabelWithAnnotations.model_rebuild()
 AnnotationWithImage.model_rebuild()
 AnnotationWithLabel.model_rebuild()
@@ -62,24 +74,34 @@ __all__ = [
     "DBHealth",
     "S3Health",
     # Dataset
-    "DatasetStatus",
     "DatasetBase",
     "DatasetCreate",
     "DatasetUpdate",
     "Dataset",
     "DatasetWithImages",
+    "DatasetWithLabels",
+    "DatasetDetail",
     # Image
     "ImageBase",
     "ImageCreate",
     "ImageUpdate",
     "Image",
     "ImageWithDataset",
+    "ImageWithDownloadUrl",
+    "ImageStatus",
+    "ImageUploadRequest",
+    "ImageUploadResponse",
+    "ImageUploadBatchRequest",
+    "ImageUploadBatchResponse",
+    "ImageConfirmUploadRequest",
+    "ImageListResponse",
+    "ImageWithUrlListResponse",
     # Label
     "LabelBase",
     "LabelCreate",
-    "LabelUpdate",
     "Label",
-    "LabelWithDataset",
+    "LabelListResponse",
+    "LabelWithDatasets",
     "LabelWithAnnotations",
     # Annotation
     "AnnotationBase",

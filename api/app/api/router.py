@@ -2,6 +2,7 @@ from fastapi import APIRouter
 from app.api.endpoints.health import router as health_router
 from app.api.endpoints.datasets import router as datasets_router
 from app.api.endpoints.labels import router as labels_router
+from app.api.endpoints.images import router as images_router
 
 # Router principal sans versioning
 api_router = APIRouter()
@@ -14,3 +15,6 @@ api_router.include_router(datasets_router)
 
 # Include label endpoints
 api_router.include_router(labels_router)
+
+# Include image endpoints
+api_router.include_router(images_router)

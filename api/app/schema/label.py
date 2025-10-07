@@ -1,6 +1,11 @@
 from pydantic import BaseModel, Field
 from typing import Optional, List
-from datetime import datetime
+
+
+class LabelListResponse(BaseModel):
+    """Schema for paginated label list response"""
+    total: int = Field(..., description="Total number of labels")
+    items: List["Label"] = Field(..., description="List of labels")
 
 
 class LabelBase(BaseModel):
@@ -11,30 +16,21 @@ class LabelBase(BaseModel):
 
 class LabelCreate(LabelBase):
     """Schema for creating a new label"""
-    dataset_id: int = Field(..., gt=0,
-                            description="ID of the dataset this label belongs to")
-
-
-class LabelUpdate(BaseModel):
-    """Schema for updating a label"""
-    name: Optional[str] = Field(None, min_length=1, max_length=255)
+    pass
 
 
 class Label(LabelBase):
     """Schema for label response"""
     id: int = Field(..., description="Label ID")
-    dataset_id: int = Field(..., description="Dataset ID")
-    created_at: datetime = Field(..., description="Creation timestamp")
-    updated_at: datetime = Field(..., description="Last update timestamp")
 
     class Config:
         from_attributes = True
 
 
-class LabelWithDataset(Label):
-    """Schema for label with associated dataset"""
-    dataset: "Dataset" = Field(...,
-                               description="Dataset this label belongs to")
+class LabelWithDatasets(Label):
+    """Schema for label with associated datasets"""
+    datasets: List["Dataset"] = Field(
+        default_factory=list, description="Datasets using this label")
 
     class Config:
         from_attributes = True

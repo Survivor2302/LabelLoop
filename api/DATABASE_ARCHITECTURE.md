@@ -13,7 +13,6 @@ CREATE TABLE datasets (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     description TEXT,
-    status VARCHAR(20) NOT NULL DEFAULT 'creating',
     created_at TIMESTAMP DEFAULT now(),
     updated_at TIMESTAMP DEFAULT now()
 );
@@ -41,14 +40,23 @@ CREATE TABLE images (
 ```sql
 CREATE TABLE labels (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    dataset_id INTEGER REFERENCES datasets(id),
+    name VARCHAR(255) NOT NULL UNIQUE,
     created_at TIMESTAMP DEFAULT now(),
     updated_at TIMESTAMP DEFAULT now()
 );
 ```
 
-### 4. **annotations**
+### 4. **dataset_labels** (table de liaison)
+
+```sql
+CREATE TABLE dataset_labels (
+    dataset_id INTEGER REFERENCES datasets(id),
+    label_id INTEGER REFERENCES labels(id),
+    PRIMARY KEY (dataset_id, label_id)
+);
+```
+
+### 5. **annotations**
 
 ```sql
 CREATE TABLE annotations (
@@ -67,7 +75,7 @@ CREATE TABLE annotations (
 
 ```
 Dataset (1) ←→ (N) Image
-Dataset (1) ←→ (N) Label
+Dataset (N) ←→ (N) Label (via dataset_labels)
 Image (1) ←→ (N) Annotation
 Label (1) ←→ (N) Annotation
 ```
@@ -75,7 +83,7 @@ Label (1) ←→ (N) Annotation
 ### Relations détaillées :
 
 - **Dataset → Images** : Un dataset contient plusieurs images
-- **Dataset → Labels** : Un dataset définit plusieurs labels possibles
+- **Dataset ↔ Labels** : Relation many-to-many via la table `dataset_labels`
 - **Image → Annotations** : Une image peut avoir plusieurs annotations
 - **Label → Annotations** : Un label peut être utilisé dans plusieurs annotations
 
@@ -83,11 +91,11 @@ Label (1) ←→ (N) Annotation
 
 ### Contraintes de cohérence :
 
-1. **Label cohérence** : Un `label_id` dans `annotations` doit appartenir au même dataset que l'`image_id`
+1. **Label unique** : Le nom des labels est unique dans toute la base
 2. **Cascade delete** :
-   - Supprimer un dataset → supprime toutes ses images et labels
+   - Supprimer un dataset → supprime toutes ses images et les liens avec les labels
    - Supprimer une image → supprime toutes ses annotations
-   - Supprimer un label → supprime toutes ses annotations
+   - Supprimer un label → supprime toutes ses annotations et les liens avec les datasets
 
 ### Optimisations :
 
@@ -105,13 +113,18 @@ dataset = Dataset(name="Voitures", description="Dataset de voitures")
 db.add(dataset)
 db.commit()
 
-# 2. Créer les labels
-labels = [
-    Label(name="voiture", dataset_id=dataset.id),
-    Label(name="camion", dataset_id=dataset.id),
-    Label(name="moto", dataset_id=dataset.id)
-]
-db.add_all(labels)
+# 2. Créer ou récupérer les labels
+labels = []
+for name in ["voiture", "camion", "moto"]:
+    label = db.query(Label).filter(Label.name == name).first()
+    if not label:
+        label = Label(name=name)
+        db.add(label)
+        db.commit()
+    labels.append(label)
+
+# 3. Associer les labels au dataset
+dataset.labels.extend(labels)
 db.commit()
 ```
 
@@ -144,13 +157,17 @@ annotations = db.query(Annotation).options(
 ).filter(Annotation.image_id == image_id).all()
 
 # Tous les labels d'un dataset
-labels = db.query(Label).filter(Label.dataset_id == dataset_id).all()
+labels = db.query(Label).join(dataset_labels).filter(
+    dataset_labels.c.dataset_id == dataset_id
+).all()
 
-# Vérifier qu'un label appartient au même dataset qu'une image
-valid_annotation = db.query(Annotation).join(Image).join(Label).filter(
+# Vérifier qu'un label est associé au dataset d'une image
+valid_annotation = db.query(Annotation).join(Image).join(Label).join(
+    dataset_labels, Label.id == dataset_labels.c.label_id
+).filter(
     Annotation.image_id == image_id,
     Annotation.label_id == label_id,
-    Image.dataset_id == Label.dataset_id
+    Image.dataset_id == dataset_labels.c.dataset_id
 ).first()
 
 # Accéder au nom du label via la relation

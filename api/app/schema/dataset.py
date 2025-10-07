@@ -1,15 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import Optional, List
 from datetime import datetime
-from enum import Enum
-
-
-class DatasetStatus(str, Enum):
-    """Status of a dataset"""
-    CREATING = "creating"
-    READY = "ready"
-    PROCESSING = "processing"
-    ERROR = "error"
 
 
 class DatasetBase(BaseModel):
@@ -18,20 +9,18 @@ class DatasetBase(BaseModel):
                       description="Dataset name")
     description: Optional[str] = Field(
         None, max_length=1000, description="Dataset description")
-    status: DatasetStatus = Field(
-        default=DatasetStatus.CREATING, description="Dataset status")
 
 
 class DatasetCreate(DatasetBase):
     """Schema for creating a new dataset"""
-    pass
+    label_names: List[str] = Field(
+        default_factory=list, description="List of label names to associate with the dataset")
 
 
 class DatasetUpdate(BaseModel):
     """Schema for updating a dataset"""
     name: Optional[str] = Field(None, min_length=1, max_length=255)
     description: Optional[str] = Field(None, max_length=1000)
-    status: Optional[DatasetStatus] = None
 
 
 class Dataset(DatasetBase):
@@ -53,3 +42,26 @@ class DatasetWithImages(Dataset):
 
     class Config:
         from_attributes = True
+
+
+class DatasetWithLabels(Dataset):
+    """Schema for dataset with associated labels"""
+    labels: List["Label"] = Field(
+        default_factory=list, description="Labels in dataset")
+
+    class Config:
+        from_attributes = True
+
+
+class DatasetDetail(BaseModel):
+    """Schema for detailed dataset response with counts"""
+    id: int = Field(..., description="Dataset ID")
+    name: str = Field(..., description="Dataset name")
+    description: Optional[str] = Field(None, description="Dataset description")
+    created_at: datetime = Field(..., description="Creation timestamp")
+    updated_at: datetime = Field(..., description="Last update timestamp")
+    image_count: int = Field(..., description="Number of images in dataset")
+    annotation_count: int = Field(...,
+                                  description="Number of annotations in dataset")
+    label_count: int = Field(...,
+                             description="Number of labels linked to dataset")

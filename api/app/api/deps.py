@@ -4,6 +4,7 @@ from app.core.database import engine, get_db
 from app.services.health_service import HealthService
 from app.services.dataset_service import DatasetService
 from app.services.label_service import LabelService
+from app.services.image_service import ImageService
 
 
 def get_health_service() -> HealthService:
@@ -16,3 +17,7 @@ def get_dataset_service(db: Session = Depends(get_db)) -> DatasetService:
 
 def get_label_service(db: Session = Depends(get_db)) -> LabelService:
     return LabelService(db)
+
+
+def get_image_service(db: Session = Depends(get_db)) -> ImageService:
+    return ImageService(db)

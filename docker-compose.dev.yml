@@ -61,6 +61,8 @@ services:
       - MINIO_ACCESS_KEY=admin
       - MINIO_SECRET_KEY=password
       - MINIO_BUCKET=datasets
+      - MINIO_PUBLIC_ENDPOINT=localhost:9000
+      - MINIO_PUBLIC_SECURE=False
     ports:
       - "8000:8000"
     depends_on:
@@ -93,6 +95,27 @@ services:
     restart: unless-stopped
     volumes:
       - ./webapp:/app
+      - /app/node_modules # Exclude node_modules from volume mount
+    # Le Dockerfile.dev gère déjà la commande avec npm run dev
+
+  # Vue.js Frontend (Development)
+  webapp-vuejs:
+    build:
+      context: ./webapp-vuejs
+      dockerfile: Dockerfile.dev
+    container_name: labelloop-webapp-vuejs-dev
+    environment:
+      - VITE_API_URL=http://localhost:8000
+      - NODE_ENV=development
+    ports:
+      - "5173:5173"
+    depends_on:
+      - api
+    networks:
+      - labelloop-dev-network
+    restart: unless-stopped
+    volumes:
+      - ./webapp-vuejs:/app
       - /app/node_modules # Exclude node_modules from volume mount
     # Le Dockerfile.dev gère déjà la commande avec npm run dev
 

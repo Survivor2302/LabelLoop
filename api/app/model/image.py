@@ -1,7 +1,15 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Enum
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.core.database import Base
+import enum
+
+
+class ImageStatus(str, enum.Enum):
+    """Image upload status"""
+    UPLOADING = "uploading"
+    UPLOADED = "uploaded"
+    ERROR = "error"
 
 
 class Image(Base):
@@ -14,6 +22,8 @@ class Image(Base):
     mime_type = Column(String(100), nullable=False)
     width = Column(Integer, nullable=True)
     height = Column(Integer, nullable=True)
+    status = Column(Enum(ImageStatus), nullable=False,
+                    default=ImageStatus.UPLOADING)
     dataset_id = Column(Integer, ForeignKey(
         "datasets.id"), nullable=False, index=True)
     created_at = Column(DateTime(timezone=True),
@@ -23,7 +33,7 @@ class Image(Base):
 
     # Relation vers Dataset (many-to-one)
     dataset = relationship("Dataset", back_populates="images")
-    
+
     # Relation vers Annotation (one-to-many)
     annotations = relationship(
         "Annotation", back_populates="image", cascade="all, delete-orphan")
