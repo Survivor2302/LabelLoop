@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
+import DashboardView from '../views/DashboardView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -8,6 +9,27 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: HomeView,
+    },
+    {
+      path: '/dashboard',
+      name: 'dashboard',
+      component: DashboardView,
+    },
+    {
+      path: '/datasets',
+      name: 'datasets',
+      // route level code-splitting
+      // this generates a separate chunk (Datasets.[hash].js) for this route
+      // which is lazy-loaded when the route is visited.
+      component: () => import('../views/DatasetsView.vue'),
+    },
+    {
+      path: '/datasets/:id',
+      name: 'dataset-detail',
+      // route level code-splitting
+      // this generates a separate chunk (DatasetDetail.[hash].js) for this route
+      // which is lazy-loaded when the route is visited.
+      component: () => import('../views/DatasetDetailView.vue'),
     },
     {
       path: '/about',
